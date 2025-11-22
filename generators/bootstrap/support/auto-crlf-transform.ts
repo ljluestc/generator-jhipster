@@ -59,7 +59,9 @@ const autoCrlfTransform = async ({ baseDir }: { baseDir: string }) => {
   });
 
   if (!(await git.checkIsRepo())) {
-    throw new Error(`${baseDir} is not inside a git repository`);
+    // Return a no-op transform when not in a git repository
+    // This allows JDL generation with --auto-crlf to work before git is initialized
+    return transform((file) => file);
   }
 
   return transform(async (file: MemFsEditorFile) => {
