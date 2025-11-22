@@ -2,8 +2,7 @@ import { before, describe, expect, it } from 'esmocha';
 
 import { defaultHelpers as helpers } from '../../../lib/testing/index.ts';
 
-import { detectCrLf } from './auto-crlf-transform.ts';
-import autoCrlfTransform from './auto-crlf-transform.ts';
+import autoCrlfTransform, { detectCrLf } from './auto-crlf-transform.ts';
 
 describe('generator - bootstrap - utils', () => {
   describe('::detectCrLf', () => {
@@ -53,7 +52,7 @@ describe('generator - bootstrap - utils', () => {
           isFileStateModified: () => true,
         };
 
-        const result = await new Promise((resolve) => {
+        const result = await new Promise(resolve => {
           const stream = transform();
           stream.on('data', resolve);
           stream.write(mockFile);

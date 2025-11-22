@@ -47,11 +47,12 @@ import {
 } from '../server/support/index.ts';
 import type { Config as SpringCacheConfig } from '../spring-cache/types.ts';
 import type { Config as SpringCloudStreamConfig } from '../spring-cloud-stream/types.ts';
-
 import cleanupTask from './cleanup.ts';
 import { writeFiles as writeEntityFiles } from './entity-files.ts';
 import { serverFiles } from './files.ts';
 import { askForOptionalItems, askForServerSideOpts, askForServerTestOpts } from './prompts.ts';
+import type { SpringBootModuleConfig, SpringBootPropertyOverride, SpringBootDependencyConfig } from './support/typed-api.ts';
+import { SpringBootModuleInjector, createSpringBootInjector } from './support/typed-api.ts';
 import type {
   Application as SpringBootApplication,
   Config as SpringBootConfig,
@@ -75,7 +76,37 @@ export class SpringBootApplicationGenerator extends BaseApplicationGenerator<
   SpringBootConfig,
   SpringBootOptions,
   SpringBootSource
-> {}
+> {
+  private springBootInjector: SpringBootModuleInjector = createSpringBootInjector();
+
+  /**
+   * Inject a Spring Boot module with type safety
+   */
+  async injectSpringBootModule(config: SpringBootModuleConfig): Promise<void> {
+    await this.springBootInjector.injectModule(config.module, config).applyTo(this);
+  }
+
+  /**
+   * Override a Spring Boot property with type safety
+   */
+  overrideSpringBootProperty<T>(override: SpringBootPropertyOverride<T>): void {
+    void this.springBootInjector.overrideProperty(override.property, override.value, override).applyTo(this);
+  }
+
+  /**
+   * Add a Spring Boot dependency with type safety
+   */
+  addSpringBootDependency(config: SpringBootDependencyConfig): void {
+    void this.springBootInjector.addDependency(config).applyTo(this);
+  }
+
+  /**
+   * Get the Spring Boot module injector for advanced usage
+   */
+  getSpringBootInjector(): SpringBootModuleInjector {
+    return this.springBootInjector;
+  }
+}
 
 export default class SpringBootGenerator extends SpringBootApplicationGenerator {
   fakeKeytool!: boolean;

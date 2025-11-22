@@ -21,7 +21,12 @@ import type {
   Relationship as ServerRelationship,
   Source as ServerSource,
 } from '../server/types.d.ts';
-
+import type {
+  SpringBootModuleInjector,
+  SpringBootModuleConfig,
+  SpringBootPropertyOverride,
+  SpringBootDependencyConfig,
+} from './support/typed-api.ts';
 import type command from './command.ts';
 
 type Command = HandleCommandTypes<typeof command>;
@@ -167,4 +172,10 @@ export type Application<E extends BaseApplicationEntity = Entity> = Command['App
     requiresDeleteAllUsers: boolean;
 
     springDataDescription: string;
+
+    // Typed API methods
+    injectSpringBootModule?(config: SpringBootModuleConfig): Promise<void>;
+    overrideSpringBootProperty?<T>(override: SpringBootPropertyOverride<T>): void;
+    addSpringBootDependency?(config: SpringBootDependencyConfig): void;
+    getSpringBootInjector?(): SpringBootModuleInjector;
   };
